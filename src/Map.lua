@@ -26,6 +26,8 @@ function myMap:initMap(filename)
     --cc.TMXTiledMap.getLayer(self,layerName)
     self.tilemap=cc.TMXTiledMap:create("mymap.tmx")
     g.collisionlayer=self.tilemap:getLayer("collisionlayer")
+    g.tileMap=self.tilemap
+    self:setPosition(0,0)
     --self:addChild(self.tilemap)
     self.m_map=self.tilemap
     
@@ -34,6 +36,7 @@ function myMap:initMap(filename)
     return self.m_map
 end
 function myMap:moveMap(node_hero,node_monster )
+   
     local siz=cc.Director:getInstance():getVisibleSize()
     local mapmove=node_hero.heroDierction
     local runmove=1.2
@@ -47,6 +50,7 @@ function myMap:moveMap(node_hero,node_monster )
     --print (node_hero:getPositionX(),siz.width/2-10,siz.width/2+10)
     --end
     local x=node_hero:getPositionX()
+    --print ("mapPostionX is ",self:getPositionX())
     if not mapmove and (self:getPositionX()==self:getContentSize().width- siz.width) then
         if node_hero:getPositionX()==(siz.width-10) then
             node_hero:setPositionX(node_hero:getPositionX()-1)
@@ -57,17 +61,20 @@ function myMap:moveMap(node_hero,node_monster )
         	node_hero:setPositionX(node_hero:getPositionX()+1)
         end
         return nil 
-    elseif mapmove and x>siz.width/2-100 then
+    elseif mapmove and x>siz.width/2-240 then
         return nil
-    elseif not mapmove and x<siz.width/2+100 then
+    elseif not mapmove and x<siz.width/2+240 then
         return nil
-    elseif (node_hero:getPositionX()<(siz.width/2+200)) and (node_hero:getPositionX()>(siz.width/2-200)) then
+    --elseif (node_hero:getPositionX()<(siz.width/2+300)) and (node_hero:getPositionX()>(siz.width/2-300)) then
+    else 
         node_hero:setPositionX(node_hero:getPositionX() + tempmove )
         if node_monster.running then
             node_monster:setPositionX(node_monster:getPositionX()+runmove )
         else node_monster:setPositionX(node_monster:getPositionX()+tempmove)
         end
-        self:setPositionX(self:getPositionX()+tempmove)
+        --print ("mappostition",self:getPositionX(),g.tileMap:getMapSize().width)
+        --self:setPositionX( -Min(-self:getPositionX()-tempmove,g.tileMap:getMapSize().height *g.tileMap:getTileSize().height -siz.width))
+        self:setPositionX(Max(self:getPosition()+tempmove,siz.width-g.tileMap:getMapSize().width *g.tileMap:getTileSize().width))
     end
 end
 return myMap

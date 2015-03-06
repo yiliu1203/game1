@@ -49,6 +49,8 @@ function monster:init()
 	self.bloodpro=bloodpro.create(false)
 	self:addChild(self.bloodpro)
 	self.bloodpro:setPosition(20,55)
+	self.flyBlood=flyword.create(1)
+	self:addChild(self.flyBlood)
     self.schedulerID = cc.Director:getInstance():getScheduler():scheduleScriptFunc(
     function ()
     	self:update_0second()
@@ -122,6 +124,7 @@ function monster:hurtAnimation(delaytime)
 	if self.ishurting or self.isdeaded then
 		return nil
 	end
+	print ("monster is hurting")
 	if self.isattacking or self.ishurting then
 		self:recover()
 	end
@@ -134,6 +137,8 @@ function monster:hurtAnimation(delaytime)
 	local seq =cc.Sequence:create(delay,animate,callback_hurt)
 	self.monster_sprite:runAction(seq)
 	self.monster_sprite:setFlippedX(self.monsterDirection)
+    self.flyBlood:flying(0.5)
+    self.xue_down=self.flyBlood.xue_down
 end
 function monster:hurtEnd()
 	if self.ishurting then
@@ -141,7 +146,7 @@ function monster:hurtEnd()
 	end
 	self:recover()
 	self.ishurting=false
-	self.bloodpro:setCurentBlood(self.bloodpro:getCurentBlood()-10)
+	self.bloodpro:setCurentBlood(self.bloodpro:getCurentBlood()-self.xue_down)
 end
 function monster:runEnd()
     if not self.running  then
@@ -217,8 +222,8 @@ function monster:seeRun()
     end
     local moveby=nil
     if self.monsterDidrection then
-    	moveby =cc.MoveBy:create(2,cc.p(-100,0))
-    else moveby =cc.MoveBy:create(2,cc.p(100,0))
+    	moveby =cc.MoveBy:create(2,cc.p(100,0))-----这里应该是反的啊?????
+    else moveby =cc.MoveBy:create(2,cc.p(-100,0))
     end
     local animate=cc.Animate:create(self.animation_run)
     --local spawn=cc.Spawn:create(moveby,animate)
@@ -235,7 +240,7 @@ end
 function monster:judgeAttack()
     math.randomseed(os.time())
     local t=math.random(1,150)
-    if t>148 then
+    if t>100 then
     	self:attackAnimation()
     end    
 end
@@ -253,7 +258,7 @@ function monster:update_4second()
     -- dis是每4 s 才计算一次的，近距离的时候才每帧计算
     print ("hero-monster xy",x,y)
     self.dis= math.sqrt(x*x+y*y)
-    self.monsterDirection=x<0 or false
+    self.monsterDirection=x<0
     if not self.running then
     	self:seeRun()
     end

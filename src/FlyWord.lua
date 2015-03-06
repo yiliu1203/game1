@@ -1,5 +1,5 @@
 local flyword =class("FlyWord",function ()
-	return cc.node.create()
+	return cc.Node:create()
 end)
 
 function flyword:createwordFormtype(type)--提供几种选择的样式，需要其他的样式在这里加
@@ -7,23 +7,26 @@ function flyword:createwordFormtype(type)--提供几种选择的样式，需要�
 		self.color=cc.c3b(255,0,0)
 		self.fontsize=30
 		self.fontstring="fonts/Marker Felt.ttf"
-		self.moveup=cc.p(0,20)
-		self.beginposition=cc.p(10,0)
+		self.moveup=cc.p(50,20)
+		self.beginposition=cc.p(40,20)
 		self.scaleto=2
+		self.pertime=0.5
 	end
 	if type==2 then
 		self.color=cc.c3b(0,0,255)
 		self.fontsize=25
         self.fontstring="fonts/Marker Felt.ttf"
-        self.moveup =cc.p(0,20)
-        self.beginposition=cc.p(10,0)
+        self.moveup =cc.p(50,20)
+        self.beginposition=cc.p(40,20)
         self.scaleto =2
 	end
 end
 
 function flyword.create(type)
 	local flynode=flyword.new()
+    flynode:createwordFormtype(type)
 	flynode:init()
+	flynode:setVisible(false)
 	return flynode
 end
 
@@ -32,26 +35,31 @@ function flyword:ctor(type)
 end
 function flyword:init()
 	--local lable1=cc.Label:createWithTTF("123")
-    local label=cc.Label:createWithSystemFont("",self.fontstring,self.fontsize,cc.size(200,200),cc.TEXT_ALIGNMENT_LEFT,cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
+	--cc.Label:createWithSystemFont(text,font,fontSize,dimensions,hAlignment,vAlignment)
+    local label=cc.Label:createWithSystemFont("22",self.fontstring,self.fontsize,cc.size(200,200),cc.TEXT_ALIGNMENT_LEFT,cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
+    --local label=cc.Label:createWithSystemFont("222222222222","fonts/Marker Felt.ttf",20,cc.size(200,200),cc.TEXT_ALIGNMENT_LEFT,cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
     label:setColor(self.color)
     label:setPosition(self.beginposition)
-    self:addChild(la,3)
-    self.label=la
-    label:setVisible(false)
+    self:addChild(label,3)
+    self.label=label
+    
 end
 function flyword:flying(dtime)
-	local moveby=cc.MoveBy:create(1,self.moveup)
-	local callback=cc.CallFunc.create(function()
-	self.label:setVisible(true)
+    print ("start flying")
+    self:flyend()
+    local moveby=cc.MoveBy:create(self.pertime,self.moveup)
+	local callback=cc.CallFunc:create(function()
+	self:setVisible(true)
 	end)
 	local delaytime=cc.DelayTime:create(dtime or 0.3)
-    local scaleto=cc.ScaleTo:create(1,self.scaleto)
-    local spawn=cc.Spawn:create(moveby,scaleto)
+    local scaleby=cc.ScaleBy:create(self.pertime,self.scaleto)
+    local spawn=cc.Spawn:create(moveby,scaleby)
     local callback2=cc.CallFunc:create(function()
     self:flyend()
     end)
+    self.label:setString(self:getxuenum())
     local seq=cc.Sequence:create(delaytime,callback,spawn,callback2)
-    cc.label:runAction(seq)
+    self:runAction(seq)
 end
 function flyword:getxuenum()
     math.randomseed(os.time())
@@ -60,7 +68,11 @@ function flyword:getxuenum()
     return tostring(self.xue_down)
 end
 function flyword:flyend()
-	self.label:setScale(1)
-	self.label:setPosition(self.beginposition)
-	self.label:setVsisible(false)
+	self:setScale(1)
+	self:stopAllActions()
+	self:setPosition(self.beginposition)
+	self:setVisible(false)
+	print ("flyend------")
+	
 end
+return flyword

@@ -3,7 +3,7 @@
  <tileset firstgid="1" name="tmw_desert_spacing" tilewidth="32" tileheight="32" spacing="1" margin="1">
   <image source="tmw_desert_spacing.png" width="265" height="199"/>
  </tileset>
- <layer name="bgimglayer" width="30" height="15" visible="0" opacity="0.9">
+ <layer name="bgimglayer" width="30" height="15" opacity="0.9">
   <data encoding="base64" compression="zlib">
    eJyTY2BgkMOB9fBgXHpIxaSYj8891HbXKB7Fo5j2mGeY2EEv+waqjCOm7B3K5TEALN021w==
   </data>

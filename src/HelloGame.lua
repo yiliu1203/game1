@@ -1,4 +1,5 @@
 require("constState")
+flyword=require("FlyWord")
 local HelloGame=class("hellogame",function ()
 	return cc.Layer:create()
 end)
@@ -20,6 +21,9 @@ function HelloGame.create()
 end
 
 function HelloGame:init()
+    local label=cc.Label:createWithSystemFont("222222222222","fonts/Marker Felt.ttf",20,cc.size(200,200),cc.TEXT_ALIGNMENT_LEFT,cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
+    self:addChild(label,3)
+    label:setPosition(200,100)
    -- local scene=cc.Scene:create()
     local Map =require("Map")
     local map=Map.create()
@@ -34,7 +38,8 @@ function HelloGame:init()
     local monster=Monster.create(hero)
     self:addChild(monster)
     self.monster=monster
-    monster:setPosition(300,200)
+    --self.monster:setScale(0.5)
+    monster:setPosition(400,200)
     local bloodProgress=require("BloodProgress")
     local bloodprogress=bloodProgress.create(true)
     self:addChild(bloodprogress)
@@ -59,13 +64,13 @@ function HelloGame:init()
     -- update 每一帧都执行
     local function updateHandle()
         if hero.isattacking or hero.isshooting or hero.ishurting   then
-        	if hero.isshooting then
+            if hero.isshooting and  hero.jiantou_flying then
         		local r1=monster:getRect()
         		r1.height=r1.height-60
         		r1.y=r1.y-20
         		local x,y=hero.jiantou_sprite:getPosition()
         		if cc.rectContainsPoint(r1,cc.p(x,y)) then
-                  hero:jiantouEnd()
+                  hero:jiantouEnd()                
         		  monster:hurtAnimation(0.01)
         		end
         	end
@@ -76,20 +81,32 @@ function HelloGame:init()
             return nil
         elseif hero_state==hero_run_state.run_left then
             self.m_hero:setRunAnimation(true)
+            if checkCollision(self.m_hero:getPositionX()-1,self.m_hero:getPositionY()) then
+                return nil
+            end
             if self.m_hero.running then
                 self.m_hero:setPositionX(self.m_hero:getPositionX()-1)
             end
             map:moveMap(self.m_hero,monster)
         elseif hero_state==hero_run_state.run_right then
             self.m_hero:setRunAnimation(false)
+            if checkCollision(self.m_hero:getPositionX()+1,self.m_hero:getPositionY()) then
+            	return nil
+            end
             if self.m_hero.running then
                 self.m_hero:setPositionX(self.m_hero:getPositionX()+1)
             end            
             map:moveMap(self.m_hero,monster)
         elseif hero_state ==hero_run_state.run_up then
+            if checkCollision(self.m_hero:getPositionX(),self.m_hero:getPositionY()+1) then
+            	return nil
+            end
             self.m_hero:setPositionY(self.m_hero:getPositionY()+1)
             self.m_hero:setRunAnimation(self.m_hero.heroDierction)
         elseif hero_state ==hero_run_state.run_down then
+            if checkCollision(self.m_hero:getPositionX(),self.m_hero:getPositionY()-1) then
+            	return nil
+            end
             self.m_hero:setPositionY(self.m_hero:getPositionY()-1)
             self.m_hero:setRunAnimation(self.m_hero.heroDierction)
         end

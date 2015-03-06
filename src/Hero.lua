@@ -27,6 +27,8 @@ function hero:init()
 	self:addChild(self.hero_sprite)
 	self.hero_sprite:setFlippedX(self.heroDierction)
 	self.jiantou_sprite=cc.Sprite:create("hero_jiantou.png")
+	self.flyblood=flyword.create(1)
+	self:addChild(self.flyblood)
 	--self.jiantou_sprite:retain()
 	--self:getParent():addChild(self.jiantou_sprite)
 	self.jiantou_sprite:setPosition(self:getPositionX()+10,self:getPositionY())
@@ -38,6 +40,7 @@ function hero:init()
     self.animation_shoot=temp[4]
     self.animation_shoot:setDelayPerUnit(0.1)
     self.animation_run:retain()
+    self.animation_run:setDelayPerUnit(0.1)
     self.animation_attack:retain()
     self.animation_hurt:retain()
     self.animation_shoot:retain()
@@ -116,6 +119,8 @@ function hero:hurtAnimation()
     local seq=cc.Sequence:create(delay,animate,callback)
 	self.hero_sprite:runAction(seq)
 	self.ishurting =true
+    self.flyblood:flying(0.5)
+    self.xue_down=self.flyblood.xue_down
 end
 function hero:hurtEnd()
 	if not self.ishurting then
@@ -123,11 +128,11 @@ function hero:hurtEnd()
 	end
 	self:recover()
 	self.ishurting=false
-	self.bloodpro:blooddown(10)
+	self.bloodpro:blooddown(self.xue_down)
 end
 function hero:shootAnimation()
-    print("startshoot is",self.isshooting)
-    if self.isshooting or self.isattacking or self.ishurting then
+    print("startshoot is and shoot_animate",self.isshooting,self.shooting_animate)
+    if self.isshooting  or self.isattacking or self.ishurting then
     	return nil
     end
     if self.running or self.ishurting then
@@ -177,7 +182,7 @@ function hero:jiantouEnd()
     --	self.isshooting=false
     --end
     if not self.shooting_animate then
-    	self.isshooting=false
+        self.isshooting=false
     end
 end
 function hero:shootEndFull()
