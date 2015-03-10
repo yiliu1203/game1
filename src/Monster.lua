@@ -49,6 +49,7 @@ function monster:init()
 	self.bloodpro=bloodpro.create(false)
 	self:addChild(self.bloodpro)
 	self.bloodpro:setPosition(20,55)
+	local flyword=require("FlyWord")
 	self.flyBlood=flyword.create(1)
 	self:addChild(self.flyBlood)
     self.schedulerID = cc.Director:getInstance():getScheduler():scheduleScriptFunc(
@@ -147,6 +148,10 @@ function monster:hurtEnd()
 	self:recover()
 	self.ishurting=false
 	self.bloodpro:setCurentBlood(self.bloodpro:getCurentBlood()-self.xue_down)
+    print ("cruentblood　",self.bloodpro:getCurentBlood())
+	if self.bloodpro:getCurentBlood()<=0 then
+		self:deadAnimation()
+	end
 end
 function monster:runEnd()
     if not self.running  then
@@ -162,11 +167,10 @@ function monster:deadAnimation()
 	end
 	local animate=cc.Animate:create(self.animation_dead)
 	self.animation_dead:setRestoreOriginalFrame(false)
-	local callback_dead=cc.CallFunc:create(
-	function ()
-		self:deadedEnd()
+	local callback_dead=cc.CallFunc:create(function ()
+	self:deadedEnd()
 	end)
-	local seq =cc.Sequence(animate,callback_dead)
+	local seq =cc.Sequence:create(animate,callback_dead)
 	self.monster_sprite:runAction(seq)
 	self.isdeaded=true
 end
@@ -177,7 +181,7 @@ function monster:deadedEnd()
 	local ac1=cc.Blink:create(3,3)
 	local ac2=cc.CallFunc:create(
 	function ()
-		self:removeChild(self.monster_sprite,1)
+		--self:removeChild(self.monster_sprite,true)
 		self:setVisible(false)
 		--self.isdeaded=true
 	end)

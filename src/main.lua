@@ -20,6 +20,11 @@ function __G__TRACKBACK__(msg)
 end
 
 local function main()
+    
+    local cenemy=require("enemy")
+    local enemymodel=cenemy.create()
+    local cdenemy=require("devEnemy")
+    local denemymodel=cdenemy.create()
     collectgarbage("collect")
     -- avoid memory leak
     collectgarbage("setpause", 100)

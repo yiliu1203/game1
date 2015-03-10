@@ -6,8 +6,8 @@ function bloodprog:ctor()
     self.blood_backimg=cc.Sprite:create("xue_back.png")
     self.blood_foreimg=cc.Sprite:create("xue_fore.png")
     self.m_scale=1
-    self.blood_total=300
-    self.blood_curent=300
+    self.blood_total=100
+    self.blood_curent=100
 end
 function bloodprog.create(bool_show_kuang)
 	local blood=bloodprog.new()
@@ -42,9 +42,9 @@ function bloodprog:setTotalBlood(total)
 	self.blood_total=total
 end
 function bloodprog:setCurentBlood(curent)
-    if curent<0 or curent >self.blood_total then
-        return false
-    end
+    --if curent<0 or curent >self.blood_total then
+    --    return false
+    --end
     self.blood_curent =curent
     local locarect=self.blood_foreimg:getTextureRect()
     local wid=self.blood_curent *self.m_scale

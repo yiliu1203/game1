@@ -21,9 +21,22 @@ function HelloGame.create()
 end
 
 function HelloGame:init()
-    local label=cc.Label:createWithSystemFont("222222222222","fonts/Marker Felt.ttf",20,cc.size(200,200),cc.TEXT_ALIGNMENT_LEFT,cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
-    self:addChild(label,3)
-    label:setPosition(200,100)
+   
+    local cache = cc.SpriteFrameCache:getInstance()
+    cache:addSpriteFrames("pp.plist", "pp.png")
+    local animationFrames = {}
+    for i = 1, 424 do
+        local frame = cache:getSpriteFrame(string.format("%d_1.png", i))
+        animationFrames[i] = frame
+    end
+    local animation = cc.Animation:createWithSpriteFrames(animationFrames, 0.1)
+    local sprite=cc.Sprite:create()
+    local animate =cc.Animate:create(animation)
+    sprite:runAction(animate)
+    self:addChild(sprite,3)
+    self.sprite=sprite
+    sprite:setPosition(500,200)
+   
    -- local scene=cc.Scene:create()
     local Map =require("Map")
     local map=Map.create()
@@ -40,6 +53,11 @@ function HelloGame:init()
     self.monster=monster
     --self.monster:setScale(0.5)
     monster:setPosition(400,200)
+    
+    local cenemy=require("enemy")
+    local enemy=cenemy.create()
+    self:addChild(enemy)
+    enemy:setPosition( 300,300)
     local bloodProgress=require("BloodProgress")
     local bloodprogress=bloodProgress.create(true)
     self:addChild(bloodprogress)
@@ -133,7 +151,9 @@ function HelloGame:onKeyPressed(keycode, event)
         heroattack_monsterHurt(self.m_hero,self.monster,2)
         --self.m_hero:stopAnimation()
         --self.m_hero:hurtAnimation()
-    end
+    elseif keycode ==128 then
+        
+    end 
     print (keycode)
 end
 function HelloGame:onKeyReleased(keycode, event)
