@@ -1,6 +1,6 @@
 require("help")
 local monster=class("Monster",function ()
-	return cc.Node:create()
+	return require("enemy").new()
 end)
 local mon_animation_file={"monster_run","monster_attack","monster_hurt","monster_dead"}
 local mon_animation_file_nam={6,5,2,2}
@@ -61,7 +61,7 @@ function monster:init()
         function ()
             self:update_4second()
         end
-        , 4, false)
+        , 3, false)
 end
 function monster:recover()
     self:removeChild(self.monster_sprite,true)
@@ -259,7 +259,7 @@ end
 function monster:update_4second()
     local x=self.m_hero:getPositionX()-self:getPositionX()
     local y=self.m_hero:getPositionY()-self:getPositionY()
-    -- dis是每4 s 才计算一次的，近距离的时候才每帧计算
+     --dis是每4 s 才计算一次的，近距离的时候才每帧计算
     print ("hero-monster xy",x,y)
     self.dis= math.sqrt(x*x+y*y)
     self.monsterDirection=x<0

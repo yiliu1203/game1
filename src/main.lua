@@ -53,6 +53,8 @@ local function main()
     else
         cc.Director:getInstance():runWithScene(gameScene)
     end
+    --local scene2=require("HelloGame")
+    --cc.Director:getInstance():replaceScene(scene2.create())
 
 end
 

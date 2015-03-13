@@ -23,7 +23,9 @@ enemy_state_types={
 "dead"
 }
 hero_run_state=createEnumTable(hero_state_types)
-enemy_state=createEnumTable(hero_state_types)
+enemy_state=createEnumTable(enemy_state_types)
 g={}
 g.collisionlayer={}
-
+g.hero={}
+g.enemys={}
+g.map={}

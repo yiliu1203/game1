@@ -68,10 +68,16 @@ function myMap:moveMap(node_hero,node_monster )
     --elseif (node_hero:getPositionX()<(siz.width/2+300)) and (node_hero:getPositionX()>(siz.width/2-300)) then
     else 
         node_hero:setPositionX(node_hero:getPositionX() + tempmove )
-        if node_monster.running then
-            node_monster:setPositionX(node_monster:getPositionX()+runmove )
-        else node_monster:setPositionX(node_monster:getPositionX()+tempmove)
+        for i ,enemy in ipairs(g.enemys) do
+        	if enemy.running then
+        		enemy:setPositionX(enemy:getPositionX()+runmove)
+        	else enemy:setPositionX(enemy:getPositionX()+tempmove)
+        	end
         end
+--        if node_monster.running then
+--            node_monster:setPositionX(node_monster:getPositionX()+runmove )
+--        else node_monster:setPositionX(node_monster:getPositionX()+tempmove)
+--        end
         --print ("mappostition",self:getPositionX(),g.tileMap:getMapSize().width)
         --self:setPositionX( -Min(-self:getPositionX()-tempmove,g.tileMap:getMapSize().height *g.tileMap:getTileSize().height -siz.width))
         self:setPositionX(Max(self:getPosition()+tempmove,siz.width-g.tileMap:getMapSize().width *g.tileMap:getTileSize().width))

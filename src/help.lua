@@ -29,10 +29,11 @@ function getTileCoorFromPostion(x,y)
 end
 
 function checkCollision(x,y)
+    x=x-g.map:getPositionX()
 	local x1,y1=getTileCoorFromPostion(x,y)
 	local gid= g.collisionlayer:getTileGIDAt(cc.p(x1,y1))
 	local gid2=g.collisionlayer:getTileGIDAt(cc.p(x1-1,y1))
-    local gid3=g.collisionlayer:getTileGIDAt(cc.p(x1-3,y1))
+    local gid3=g.collisionlayer:getTileGIDAt(cc.p(x1-2,y1))
 	--print("gid  ",gid)
 	if  gid>0 or gid2>0 or gid3>0 then
 		return true

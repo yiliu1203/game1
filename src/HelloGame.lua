@@ -21,31 +21,19 @@ function HelloGame.create()
 end
 
 function HelloGame:init()
-   
-    local cache = cc.SpriteFrameCache:getInstance()
-    cache:addSpriteFrames("pp.plist", "pp.png")
-    local animationFrames = {}
-    for i = 1, 424 do
-        local frame = cache:getSpriteFrame(string.format("%d_1.png", i))
-        animationFrames[i] = frame
-    end
-    local animation = cc.Animation:createWithSpriteFrames(animationFrames, 0.1)
-    local sprite=cc.Sprite:create()
-    local animate =cc.Animate:create(animation)
-    sprite:runAction(animate)
-    self:addChild(sprite,3)
-    self.sprite=sprite
-    sprite:setPosition(500,200)
-   
+
    -- local scene=cc.Scene:create()
+   local vsize=cc.Director:getInstance():getVisibleSize()
     local Map =require("Map")
     local map=Map.create()
     self:addChild(map)
+    g.map=map
     local Hero=require("Hero")
     local hero=Hero.create()
     self:addChild(hero,2)
     hero:setPosition(100,100)
     self.m_hero=hero
+    g.hero=hero
     self:addChild(hero.jiantou_sprite)
     local Monster=require("Monster")
     local monster=Monster.create(hero)
@@ -55,9 +43,19 @@ function HelloGame:init()
     monster:setPosition(400,200)
     
     local cenemy=require("enemy")
-    local enemy=cenemy.create()
+    local enemy=cenemy.create(hero)
     self:addChild(enemy)
     enemy:setPosition( 300,300)
+    
+    local enemy2=cenemy.create(hero)
+    self:addChild(enemy2)
+    enemy2:setPosition( 500,300)
+
+    local enemy3=cenemy.create(hero)
+    self:addChild(enemy3)
+    enemy3:setPosition( 400,400)
+    g.enemys={monster,enemy,enemy2,enemy3}
+--    g.enemys ={monster,enemy}
     local bloodProgress=require("BloodProgress")
     local bloodprogress=bloodProgress.create(true)
     self:addChild(bloodprogress)
@@ -66,6 +64,21 @@ function HelloGame:init()
     --bloodprogress:setCurentBlood(30)
     -- 这里始终不能调用bloodpro的成员函数.......P ->p
     self.m_hero.bloodpro=bloodprogress
+    
+    --添加菜单按钮
+    local item=cc.MenuItemImage:create("CloseSelected.png","CloseSelected.png","CloseSelected.png")
+    item:setPosition(vsize.width-20,vsize.height-20)
+    item:registerScriptTapHandler(function()
+            -- cc.utils:captureScreen(handler,filename)
+        local tex=  cc.RenderTexture:create(vsize.width,vsize.height)
+        tex:begin()
+        self:getParent():visit()
+        tex:endToLua()
+        cc.Director:getInstance():pushScene(require("pauseLayer").create(tex))
+        end)
+    local menu=cc.Menu:create(item)
+    self:addChild(menu,5)
+    menu:setPosition(0,0)
     local listener=cc.EventListenerKeyboard:create()
     -- 为了使键盘的响应事件是成员函数，所以才这样使用一个匿名函数
     listener:registerScriptHandler(
@@ -83,14 +96,17 @@ function HelloGame:init()
     local function updateHandle()
         if hero.isattacking or hero.isshooting or hero.ishurting   then
             if hero.isshooting and  hero.jiantou_flying then
-        		local r1=monster:getRect()
-        		r1.height=r1.height-60
-        		r1.y=r1.y-20
-        		local x,y=hero.jiantou_sprite:getPosition()
-        		if cc.rectContainsPoint(r1,cc.p(x,y)) then
-                  hero:jiantouEnd()                
-        		  monster:hurtAnimation(0.01)
-        		end
+                for i, enemy in ipairs(g.enemys)  do
+                    local r1=enemy:getRect()
+                    r1.height=r1.height-60
+                    r1.y=r1.y-20
+                    local x,y=hero.jiantou_sprite:getPosition()
+                    if cc.rectContainsPoint(r1,cc.p(x,y)) then
+                        hero:jiantouEnd()                
+                        enemy:hurtAnimation(0.01)
+                    end
+                end
+        		
         	end
         end
         if hero_state==hero_run_state.run_stay then
@@ -146,9 +162,9 @@ function HelloGame:onKeyPressed(keycode, event)
     elseif keycode ==124 then   --a
         --self.m_hero:stopAnimation()
         --self.m_hero:attackAnimation()
-        heroattack_monsterHurt(self.m_hero,self.monster,1)
+        heroattack_monsterHurt(self.m_hero,1)
     elseif keycode ==127 then ---d
-        heroattack_monsterHurt(self.m_hero,self.monster,2)
+        heroattack_monsterHurt(self.m_hero,2)
         --self.m_hero:stopAnimation()
         --self.m_hero:hurtAnimation()
     elseif keycode ==128 then
@@ -169,21 +185,40 @@ function HelloGame:onKeyReleased(keycode, event)
     end
     
 end
-function heroattack_monsterHurt(node_hero,node_monster,attack_style)
-	if node_hero.isattacking or node_hero.isshooting or node_monster.isdeaded or node_monster.isattacking then
+function heroattack_monsterHurt(node_hero,attack_style)
+	if node_hero.isattacking or node_hero.isshooting   then
 		return nil
 	end
 	if attack_style ==1 then
 		node_hero:attackAnimation()
-		if math.abs(node_hero:getPositionY()-node_monster:getPositionY())<30 then
-			if cc.rectIntersectsRect(node_hero:getRect(),node_monster:getRect()) then
-				node_monster:hurtAnimation()
+		for i,enemy  in ipairs(g.enemys) do
+			if enemy.ishurting then
+				return nil
+			end
+            if math.abs(node_hero:getPositionY()-enemy:getPositionY())<30 then
+                if cc.rectIntersectsRect(node_hero:getRect(),enemy:getRect()) then
+                    enemy:hurtAnimation()
+                end
 			end
 		end
+--		if math.abs(node_hero:getPositionY()-node_monster:getPositionY())<30 then
+--			if cc.rectIntersectsRect(node_hero:getRect(),node_monster:getRect()) then
+--				node_monster:hurtAnimation()
+--			end
+--		end
 	else node_hero:shootAnimation()
 	end
-	
 end
+
+function menucallback()
+	  --local tex=  cc.RenderTexture:create(vsize.width,vsize.height)
+--        tex:begin()
+--        self:getParent():visit()
+--        tex:end()
+--        cc.Director:getInstance():pushScene(require("pauseLayer").create(tex))
+end
+
+
 return HelloGame
 
 -- 使用HelloGame。 name  和self。name  不是一个同一个
