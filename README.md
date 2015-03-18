@@ -1,1 +1,1 @@
-http://github.com/yiliu1203/game1/raw/master/screenShots/p1.png
+![image](http://github.com/yiliu1203/game1/raw/master/screenShorts/p1.png)
